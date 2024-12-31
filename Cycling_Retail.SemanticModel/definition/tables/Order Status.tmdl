@@ -1,0 +1,32 @@
+table 'Order Status'
+	lineageTag: 96d669e2-a0f8-4835-a128-bd8b27728dea
+
+	column PO
+		dataType: string
+		lineageTag: 9848ed92-5123-4bb9-a427-5f3338e5417f
+		summarizeBy: none
+		sourceColumn: PO
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: 069dd8c5-75f2-4fbe-964a-94ad03cceb69
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Order Status' = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("Vc07CoUwEEDRvaS2mE/G0frZK1iKnQEDygtBXb+DNqY+XO40uaFHQMGagcRVblxjSmFxc/UStYKI0HizPi8hf4yF0YNKbfb7nzkW6q0jBiXTLmzxKlTZ1JM+6Z62cHywUZsStlKm8w0=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [PO = _t, Status = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"PO", type text}, {"Status", type text}})
+				in
+				    #"Changed Type"
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+
