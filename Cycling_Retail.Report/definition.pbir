@@ -1,0 +1,9 @@
+{
+  "version": "4.0",
+  "datasetReference": {
+    "byPath": {
+      "path": "../Cycling_Retail.SemanticModel"
+    },
+    "byConnection": null
+  }
+}

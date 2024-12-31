@@ -1,0 +1,14 @@
+EVALUATE
+	SUMMARIZE(
+		'Reseller Sales',
+		'Product Subcategory'[EnglishProductSubcategoryName],
+		" Total PO ", COUNT('Reseller Sales'[CustomerPONumber]),
+		"Grand total PO", CALCULATE(
+			COUNT('Reseller Sales'[CustomerPONumber]),
+			ALL('Reseller Sales')
+		),
+		"Grand total SubCat", CALCULATE(
+			COUNT('Product Subcategory'[EnglishProductSubcategoryName])
+			,ALL('Product Subcategory')
+		)
+	)

@@ -1,0 +1,456 @@
+table Metrics
+	lineageTag: d797711d-0272-4a92-92b0-663e2643acd7
+
+	measure 'Total Sales' = SUM('Sales'[Sales Amount])
+		formatString: #,0
+		lineageTag: 986516a7-d8e3-4636-82e8-6f57d9cb9cd0
+
+		changedProperty = FormatString
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Total Order Qty' = SUM('Sales'[OrderQuantity])
+		formatString: 0
+		lineageTag: 23303d6b-c8f9-441b-8600-bb9e3c02cf0d
+
+	measure 'Total Cost' = SUM('Sales'[Product Cost])
+		formatString: #,0.00
+		lineageTag: fc1c2294-8b5f-4a04-b194-5c21734ba2ba
+
+	measure 'Total Price' = SUM('Sales'[UnitPrice])
+		formatString: "£"#,0.###############;-"£"#,0.###############;"£"#,0.###############
+		lineageTag: d859059a-19be-436b-a449-cb82e09ff68a
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-GB"}
+
+	measure 'Selected Year' = SELECTEDVALUE('Date'[Year])
+		formatString: 0
+		isHidden
+		lineageTag: 7b1b9e68-adef-4945-944f-92133a50d9db
+
+		changedProperty = IsHidden
+
+	measure 'Sales Projection' = [Total Sales] * 'Sales projection 2'[Sales projection Value 2]
+		formatString: "£"#,0.###############;-"£"#,0.###############;"£"#,0.###############
+		lineageTag: ec65988b-d596-4b4a-8551-7bb9c25f818a
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-GB"}
+
+	measure KPI = if (HASONEFILTER(Product[Name]), UNICHAR(11044), BLANK())
+		lineageTag: 3376935f-2f51-4b23-990f-51134747835a
+
+	measure 'Total Prior Sales' = ```
+			
+			                                                                       
+			                    VAR _result = SWITCH( TRUE()
+			                                           ,SELECTEDVALUE('Time Selection'[Time Selection Value]) = "Quarters", [_priorquartersales]
+			                                           ,SELECTEDVALUE('Time Selection'[Time Selection Value]) = "Months" , [_priormonthsales]
+			                                           ,BLANK()
+			                                           )
+			            RETURN _result
+			```
+		lineageTag: 7427c01c-a40a-428f-89ac-ab86314619b8
+
+		changedProperty = FormatString
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _priormonthsales =
+			CALCULATE(
+			                               [Total Sales],
+			        PREVIOUSMONTH('Date'[Date])
+			    )
+		formatString: "£"#,0.###############;-"£"#,0.###############;"£"#,0.###############
+		lineageTag: e8fbf3c6-819a-4c17-b0d3-c0c53078900a
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-GB"}
+
+	measure _priorquartersales = ```
+			
+			                        VAR _maxdate = MAX('Date'[Date])
+			                   -- VAR _mindate = 
+			                    VAR _result = 
+			                                      CALCULATE( 
+			                                                     [Total Sales]
+			                                                     ,DATESINPERIOD(
+			                                                    'Date (Charts)'[Date],
+			                                                    _maxdate,
+			                                                    - 'Last N Parameter'[Last N Parameter Value]
+			                                                    ,QUARTER
+			                                                   )
+			                                                    )
+			                                   
+			
+			                    RETURN _result
+			```
+		formatString: "£"#,0.###############;-"£"#,0.###############;"£"#,0.###############
+		lineageTag: e6c298d0-dd9a-4c7e-b507-285d81519018
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-GB"}
+
+	measure 'Total Sales revenue - Last N months' = ```
+			
+			                                        VAR _selecteddate = MAX('Date'[Date])
+			                                        VAR _monthsago = EOMONTH(_selecteddate, - 'Last N Parameter'[Last N Parameter Value]-1)
+			                                        VAR _result = 
+			                                                     IF( 
+			                                                         HASONEVALUE('Date (Charts)'[Months]) 
+			                                                         && MAX('Date (Charts)'[Date]) < _selecteddate
+			                                                         && MIN('Date (Charts)'[Date]) >= _monthsago
+			                                                         ,
+			                                                         CALCULATE(
+			                                                                    [Total Sales]
+			                                                                    , FILTER(ALL('Date'[Months])
+			                                                                      ,'Date'[Months] = VALUES('Date (Charts)'[Months])
+			                                                                            )
+			                                                                    ),
+			                                                            BLANK()
+			                                                         )
+			                                        RETURN _result /1000000
+			```
+		lineageTag: 6dd744c6-024e-402b-83ee-d24e5cbc58b8
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Product Cost - Last N months' = ```
+			
+			                                        VAR _selecteddate = MAX('Date'[Date])
+			                                        VAR _monthsago = EOMONTH(_selecteddate, - 'Last N Parameter'[Last N Parameter Value]-1)
+			                                        VAR _result = 
+			                                                     IF( 
+			                                                         HASONEVALUE('Date (Charts)'[Months]) 
+			                                                         && MAX('Date (Charts)'[Date]) < _selecteddate
+			                                                         && MIN('Date (Charts)'[Date]) >= _monthsago
+			                                                         ,
+			                                                         CALCULATE(
+			                                                                    [Total Cost]
+			                                                                    , FILTER(ALL('Date'[Months])
+			                                                                      ,'Date'[Months] = VALUES('Date (Charts)'[Months])
+			                                                                            )
+			                                                                    ),
+			                                                            BLANK()
+			                                                         )
+			                                        RETURN _result / 1000000
+			```
+		formatString: #,0.00
+		lineageTag: a50606c8-b919-47be-b106-d70cd301cdab
+
+	measure Threshold = ```
+			
+			            VAR _SalesLowerThreshold = 1.7
+			            VAR _SalesUpperThreshold = 2.5
+			            VAR _CostLowerThreshold = 1
+			            VAR _CostUpperThreshold = 2
+			            VAR _salesrevenue = [Total Sales revenue - Last N months]
+			            VAR _result =            
+			                            IF( SELECTEDVALUE('Financials Parameter'[Param values]) = "Sales Revenue"
+			            
+			                                    ,SWITCH(  TRUE()
+			                                    ,[Total Sales revenue - Last N months] > _SalesUpperThreshold, "#1a9f61"
+			                                    , AND([Total Sales revenue - Last N months] < _SalesUpperThreshold , [Total Sales revenue - Last N months] > _SalesLowerThreshold),"#ffbf00"
+			                                    ,[Total Sales revenue - Last N months] < _SalesLowerThreshold , "#ee6644"
+			                                    ,BLANK()
+			                                             )
+			                                    
+			                                    , SWITCH(  TRUE()
+			                                    ,[Total Product Cost - Last N months] > _CostUpperThreshold, "#1a9f61"
+			                                   , AND([Total Product Cost - Last N months] < _CostUpperThreshold , [Total Product Cost - Last N months] > _CostLowerThreshold), "#ffbf00"
+			                                    ,[Total Sales revenue - Last N months] < _CostLowerThreshold , "#ee6644"
+			                                    ,BLANK()
+			                                                 )
+			                                    )
+			            RETURN _result
+			```
+		lineageTag: 7ba3df62-82d6-4fb3-a5d1-eb0aceb2472e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Revenue Ranking' = ```
+			
+			            VAR _ranking = [Ranking]    
+			            VAR _products = VALUES('Product Subcategory'[EnglishProductSubcategoryName])
+			            VAR _result = 
+			                         
+			                                  CALCULATE(  
+			                                        
+			                                          [Total Sales]
+			                                           ,FILTER(_products
+			                                             , RANKX(ALL('Product Subcategory'[EnglishProductSubcategoryName]),[Total Sales] ,  ,DESC) <= [Ranking]
+			                                                    )
+			                                       )
+			                                       
+			                              
+			                        RETURN _result
+			```
+		formatString: #,0
+		lineageTag: 81509658-7da2-4aa9-926c-64efebe75422
+
+		changedProperty = FormatString
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure Ranking = ```
+			
+			            IF( HASONEVALUE('Rank'[Rank])
+			                , VALUES('Rank'[Rank])
+			                ,99999999999999
+			            )
+			```
+		formatString: 0
+		lineageTag: 7ae5dfd9-b437-42f6-afbc-4bdb24fca23b
+
+	measure sales_revenue_monthly_variance = (DIVIDE([Total Sales],[_priormonthsales],0) - 1 ) *100
+		lineageTag: 9896a969-b1bb-4c30-9425-efa334ac11f8
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Cumulative Revenue' = CALCULATE ([Total Sales], FILTER (ALL ('Date'), 'Date'[Date] <= MAX ('Date'[Date])))/1000000
+		lineageTag: d311c362-37b4-4131-84d9-ecfac4c386bf
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure selected_metric = SELECTEDVALUE('Financials Parameter'[Param values])
+		isHidden
+		lineageTag: aaad2b1a-dfd1-4880-9b51-ee51606e7e9f
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Total_Product_Count = COUNTA('Sales'[ProductKey])
+		lineageTag: 23a4eb3d-9503-406e-b91d-c83577ed6b23
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure selected_rank = "Top "&SELECTEDVALUE('Rank'[Rank])&" selling products"
+		isHidden
+		lineageTag: 904544f0-ab54-4baa-9110-2a5e5207573e
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Measure_test =
+			SUMX(
+			    SUMMARIZECOLUMNS(
+					'Product Subcategory'[EnglishProductSubcategoryName],
+					FILTER(
+						'Product Category',
+						'Product Category'[Category] = "Bikes"
+					),
+					" Total PO ", COUNT('Sales'[CustomerPONumber]))
+			            ,[ Total PO ]
+			            )
+		lineageTag: c4f86ed6-b028-420b-9203-075c338566cc
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Measure_test%Of Total' = ```
+			
+			
+			var Grand_Tot = CALCULATE(
+			                            COUNT('Sales'[CustomerPONumber]),
+			                          FILTER(
+						                'Product Category',
+						                'Product Category'[Category] = "Bikes"
+			                                ),
+			                             ALLSELECTED()  
+			                       )
+			                       RETURN
+			                       DIVIDE([Measure_test],Grand_Tot,0)
+			                      -- FORMAT(DIVIDE([Measure_test],Grand_Tot,0),"#.#%")
+			```
+		lineageTag: cf21a781-3e2f-4680-8c83-0642b9a490bd
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure SVG = ```
+			
+			     "data:image/svg+xml;utf8,<svg version=""1.1"" id=""Layer_1"" xmlns=""http://www.w3.org/2000/svg"" xmlns:xlink=""http://www.w3.org/1999/xlink"" x=""0px"" y=""0px""
+				 width=""1500px"" height=""500px"" viewBox=""0 0 1500 500"" style=""enable-background:new 0 0 1500 500;"" xml:space=""preserve"">
+			<style type=""text/css"">
+				.st0{fill:#EB5E5E;}
+				.st1{fill:#D35455;}
+				.st2{fill:#333333;}
+				.st3{fill:#4B4A4B;}
+			</style>
+			<g id=""SQLBI"">
+				<path class=""st0"" d=""M349.1,111.4c0-18.8-77.3-33.1-173.3-33.1S2.4,92.7,2.4,110.3v1.1v263.9c0,18.8,79.5,33.1,175.5,33.1
+					s173.3-15.5,173.3-33.1V109.2L349.1,111.4z M107.3,356.5c-23.2-2.2-46.4-4.4-69.6-7.7v-38.6c23.2,2.2,46.4,4.4,69.6,5.5
+					C107.3,330,107.3,343.3,107.3,356.5z M211.1,358.8c-23.2,1.1-46.4,1.1-69.6,0V204.2h69.6C211.1,255,211.1,306.9,211.1,358.8z
+					 M313.7,348.8c-23.2,3.3-46.4,6.6-69.6,7.7V243.9c23.2,0,46.4-1.1,69.6-2.2V348.8z""/>
+				<path id=""XMLID_401_"" class=""st1"" d=""M177.9,78.3c96.1,0,173.3,14.4,173.3,30.9s-77.3,30.9-173.3,30.9S2.4,125.8,2.4,109.2
+					S81.9,78.3,177.9,78.3z""/>
+				<path id=""XMLID_391_"" class=""st2"" d=""M481.6,293.6c6.6,3.3,40.9,21,88.3,21c25.4,0,54.1-4.4,54.1-21c0-17.7-26.5-26.5-55.2-30.9
+					c-42-6.6-100.5-18.8-100.5-80.6c0-62.9,56.3-79.5,110.4-79.5c49.7,0,82.8,14.4,101.6,25.4l-18.8,51.9c-15.5-9.9-46.4-21-82.8-21
+					c-25.4,0-48.6,5.5-48.6,21c0,19.9,32,21,49.7,23.2c74,12.1,106,43.1,106,91.6c0,62.9-66.2,75.1-115.9,75.1
+					c-45.3,0-81.7-11-107.1-25.4C462.8,345.5,481.6,293.6,481.6,293.6z M939.7,493.4h-61.8v-127c-12.1,5.5-27.6,6.6-43.1,6.6
+					c-72.9,0-128.1-40.9-128.1-131.4V234c0-87.2,51.9-131.4,128.1-131.4c21,0,70.7,3.3,104.9,23.2L939.7,493.4L939.7,493.4z
+					 M769.7,241.7c0,61.8,28.7,75.1,69.6,75.1c18.8,0,32-3.3,38.6-7.7V166.6c-9.9-4.4-22.1-7.7-40.9-7.7c-42,0-67.3,14.4-67.3,75.1
+					L769.7,241.7L769.7,241.7z M977.3,6.6h64v367.7h-64L977.3,6.6L977.3,6.6z""/>
+				<path id=""XMLID_386_"" class=""st0"" d=""M1077.8,6.6h61.8v102.7c12.1-5.5,27.6-6.6,43.1-6.6c72.9,0,128.1,40.9,128.1,131.4v7.7
+					c0,88.3-51.9,131.4-128.1,131.4c-21,0-70.7-3.3-104.9-23.2V6.6z M1248.8,233.9c0-61.8-29.7-76.1-70.6-76.1c-17.7,0-32,4.4-37.5,7.7
+					V308c8.8,4.4,22.1,7.7,40.9,7.7c42,0,67.3-14.4,67.3-75.1L1248.8,233.9z M1377,6.6c21,0,37.5,15.5,37.5,35.3s-16.6,36.4-37.5,36.4
+					c-19.9,0-37.5-16.6-37.5-36.4S1356,6.6,1377,6.6L1377,6.6z M1346,115.9h61.8v257.2H1346V115.9L1346,115.9z""/>
+				<path class=""st3"" d=""M1440.9,344.5c0-5,1.3-9.7,3.8-14.1s6-7.9,10.4-10.4s9.2-3.8,14.2-3.8s9.7,1.3,14.1,3.8s7.9,6,10.4,10.4
+					s3.8,9.1,3.8,14.2c0,5-1.2,9.6-3.7,14c-2.4,4.4-5.9,7.8-10.3,10.5c-4.4,2.6-9.2,3.9-14.4,3.9c-5.2,0-10-1.3-14.4-3.9
+					s-7.8-6.1-10.3-10.4C1442.1,354.1,1440.9,349.5,1440.9,344.5z M1446.2,344.5c0,4.1,1,8,3.1,11.5c2.1,3.6,4.9,6.4,8.5,8.4
+					s7.4,3.1,11.5,3.1s8-1,11.5-3.1c3.6-2.1,6.4-4.9,8.4-8.5s3.1-7.4,3.1-11.5s-1-8-3.1-11.5c-2.1-3.6-4.9-6.4-8.5-8.4
+					c-3.6-2.1-7.4-3.1-11.5-3.1s-8,1-11.5,3.1c-3.6,2.1-6.4,4.9-8.4,8.5C1447.2,336.6,1446.2,340.4,1446.2,344.5z M1480.7,337.9
+					c0,4.3-1.8,7.2-5.4,8.8l8.9,15.1h-9.6L1468,349h-1.8v12.8h-8.6v-34.6h10c4.6,0,7.9,0.9,10,2.6
+					C1479.7,331.6,1480.7,334.3,1480.7,337.9z M1466.2,342.7h1.2c1.7,0,2.9-0.4,3.6-1.1s1.1-1.9,1.1-3.6c0-1.6-0.4-2.8-1.1-3.5
+					s-1.9-1-3.7-1h-1.1V342.7z""/>
+			</g>
+			</svg>"
+			```
+		lineageTag: 27bb5b8f-e836-4720-8b60-10c019627dfd
+		dataCategory: ImageUrl
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'SVG Donught' = ```
+			
+			            
+			// **********************************************************************
+			// input parameters
+			// Background Circle: represents percentage of current achievements (100% means everything is done)
+			var ShowBackGrndCircle = TRUE()
+			var BackGrndPercent = [Measure_test%Of Total] // value has to be >= 0 and <=1
+			// using Firefox one has to use "%23" instead of the "#"-sign
+			var BackGrndColor = 
+			                    SWITCH(
+			                        TRUE()
+			                        ,BackGrndPercent >=.50, "green"
+			                        ,AND(BackGrndPercent <.50, BackGrndPercent >=.20), "orange"
+			                        ,BackGrndPercent < .20, "red"
+			                        )
+			// Front Circle: represents effort spent for the current achievements in percent of available ressources (100% means there are no more ressources available)
+			var ShowFrontCircle = TRUE()
+			var FrontPercent =  1  // value has to be >= 0 and <=1
+			--var FrontColorGood = "#68CDFE" //68CDFE
+			--var FrontColorBad =  "#E86232" //E86232
+			// Show text below the circles
+			var ShowText = TRUE()
+			var Percent_Value = [Measure_test%Of Total] //replace the string by a value or string that will be printed
+			// **********************************************************************
+			//calculate the settings for the background layer - the segment of the larger circle
+			var BackGrndPercentValidated = IF(OR(ISBLANK(BackGrndPercent),NOT(ISNUMBER(BackGrndPercent))),-1,BackGrndPercent)
+			var BackgroundInvalidParameters =
+				IF(ISNUMBER(BackGrndPercentValidated) && (BackGrndPercentValidated >= 0 && BackGrndPercentValidated <= 1)
+					      ,"True"
+					      ,"Check 'BackGrndPercent'"
+			        )
+			var BackGrndCirclePercent = 180 - (IF(BackGrndPercentValidated > .9999, .9999, BackGrndPercentValidated) * 360)
+			var BackGrndBoolean = if(BackGrndCirclePercent < 0, 1,0)
+			var BackGrndRadians = RADIANS(BackGrndCirclePercent)
+			var BackGrndXArcEnd = sin(BackGrndRadians)
+			var BackGrndYArcEnd = cos(BackGrndRadians)
+			// **********************************************************************
+			//calculate the settings for the font layer - the segment of the larger circle
+			var FrontPercentValidated = IF(OR(ISBLANK(FrontPercent),NOT(ISNUMBER(FrontPercent))),-1,FrontPercent)
+			var FrontInvalidParameters =
+				IF(ISNUMBER(FrontPercentValidated) && (FrontPercentValidated >= 0 && FrontPercentValidated <= 1)
+			         ,"True"
+			         ,"Check: FrontPercent"
+				)
+			var FrontCirclePercent = 180 - (IF(FrontPercentValidated > .9999, .9999, FrontPercentValidated) * 360)
+			var FrontShortDistance = if(FrontCirclePercent < 0, 1,0)
+			var FrontRadians = RADIANS(FrontCirclePercent)
+			var FrontXArcEnd = sin(FrontRadians)*.8
+			var FrontYArcEnd = cos(FrontRadians)*.8
+			var colorFrontCircle = "white"
+			// **********************************************************************
+			// build the svg string 
+			var svgHeader = 
+			"data:image/svg+xml;utf8,<svg 
+			
+			   xmlns='http://www.w3.org/2000/svg'"
+			var ViewBox = 
+			    IF(ShowText," viewBox='-1 -1 2 2.5'>"," viewBox='-1 -1 2 2'>") 
+			
+			var BackGrndArc =	
+				IF(ShowBackGrndCircle
+					,IF(BackgroundInvalidParameters = "True"
+						,"<path d='M 0 -1 A 1 1 0 " & BackGrndBoolean & " 1 " & BackGrndXArcEnd & " " & BackGrndYArcEnd & "  L 0 0 z' fill='" & BackGrndColor & "'></path>"
+						,"<text x='-1' y='20%' text-anchor='left' font-family='Verdana' font-size='0.2px'>" & BackgroundInvalidParameters & "</text>"
+					)
+					,BLANK()
+				)
+			var FrontArc =
+			    IF(ShowFrontCircle
+				   ,IF(FrontInvalidParameters = "True"
+					  ,"<path d='M 0 -.8 A 0.8 0.8 0 " & FrontShortDistance & " 1 " & FrontXArcEnd & " " & FrontYArcEnd & "  L 0 0 z' fill='" & colorFrontCircle & "'></path>"
+					  ,"<text x='-1' y='30%' text-anchor='left' font-family='Verdana' font-size='0.2px'>" & FrontInvalidParameters & "</text>"
+				   )
+			       ,BLANK()
+			    )
+			var TextFooter =
+				IF(ShowText
+					,"<text x='0' y='0' text-anchor='middle' alignment-baseline='middle' font-family='Verdana' font-size='0.5px'>" & FORMAT(Percent_Value,"#%") & "</text>"
+					,BLANK()
+				)
+			var svgFooter = "</svg>"
+			return svgHeader 
+			          & ViewBox 
+			            & BackGrndArc 
+			            & FrontArc 
+			             & TextFooter 
+			                & svgFooter
+			```
+		lineageTag: 4b2238a7-bb66-434b-9d01-00233499f1ed
+		dataCategory: ImageUrl
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'SVG Timeline' = ```
+			
+			
+			VAR _actual = 150
+			VAR _target = 230
+			VAR _svgWidth = 250
+			VAR _svgHeight = 20
+			VAR _axis_width = _svgWidth/2 -- position of the taget along the axis
+			VAR _prefix = "data:image/svg+xml;utf8,<svg width="""& _svgWidth &""" height="""& _svgHeight &""" xmlns=""http://www.w3.org/2000/svg"">"
+			
+			VAR _OnOffTargetFill =  SWITCH(
+			                                TRUE()
+			                                ,_actual > _target, "red"
+			                                ,"green"
+			                                )
+			-- Position of actuals relative to target
+			VAR _position = DIVIDE(_actual,_target,0)*_axis_width
+			VAR _vectors = 
+			"<rect x="""& _target &""" width=""20"" height=""20"" fill=""#D9D9D9""/>
+			<rect x="""& _actual &""" width=""20"" height=""20"" fill="""& _OnOffTargetFill &"""/>
+			<rect x=""0"" width=""20"" height=""20"" fill=""#D9D9D9""/>
+			<line x1=""22"" y1=""10.5"" x2="""& _target &""" y2=""10.5"" stroke=""#D9D9D9"" stroke-width=""3""/>
+			<line x1="""& _actual &""" y1=""10.5"" x2="""& _target &""" y2=""9.5"" stroke="""& _OnOffTargetFill &""" stroke-width=""5""/>"
+			VAR _text = "<text x='100' y='100' text-anchor='top' alignment-baseline='top' font-family='Verdana' font-size='50px'>"  & "text" &  "</text>"
+			VAR _suffix = "</svg>"
+			VAR _svg = 
+			            _prefix 
+			                & _vectors 
+			             --       & _text 
+			            & _suffix 
+			RETURN _svg
+			
+			```
+		lineageTag: 3c5d56f5-c961-4429-88e1-84abbea3d4cb
+		dataCategory: ImageUrl
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Metrics-608e5cf7-cf60-467a-819d-73714f887b57 = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Column1"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

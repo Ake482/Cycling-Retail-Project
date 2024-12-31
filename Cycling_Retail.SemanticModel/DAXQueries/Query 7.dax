@@ -1,0 +1,25 @@
+EVALUATE
+
+	SUMMARIZECOLUMNS(
+		'Product Subcategory'[EnglishProductSubcategoryName]
+		,FILTER(
+				'Product Category',
+				'Product Category'[Category] = "Bikes"
+		         )
+		,
+		" Total PO ",
+		COUNT('Sales'[CustomerPONumber])
+	)
+	
+	EVALUATE
+	        SUMMARIZE(
+				Sales
+				,'Date'[Year]
+				,'Date'[Month]
+				,"total sales", SUM(Sales[Sales Amount])
+			)
+	EVALUATE
+	ADDCOLUMNS(
+		        'Product Subcategory'
+				,"Profit", [Sales]-[Cost]
+				)
