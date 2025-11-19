@@ -440,40 +440,6 @@ table Metrics
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure _Dummy-Line = 1
-		displayFolder: Tracking Visual
-		lineageTag: 0aebf1d4-a55c-45f7-8c18-14b9bfb465b7
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure Tracking_Pos = ```
-			
-			                VAR _selected_status = SELECTEDVALUE('Order Status'[Status])
-			                VAR _selected_status_num = 
-			                                        CALCULATE(
-			                                                    MAX(Statuses[Index])
-			                                                    ,Statuses[Status] = _selected_status
-			                                                    )
-			                VAR _result = 
-			                      IF(HASONEFILTER('Order Status'[PO])
-			                        ,IF(
-			                            SELECTEDVALUE(Statuses[Index]) <= _selected_status_num
-			                            , [_Dummy-Line]
-			                              )
-			                             )
-			                           RETURN _result
-			```
-		displayFolder: Tracking Visual
-		lineageTag: 3a260d98-16ab-4aa1-b4a7-cae39c2c7a7e
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure Status_ordering = sum(Statuses[Index])
-		displayFolder: Tracking Visual
-		lineageTag: f34018d2-3f83-4a4d-a1b7-3a81a161e5e4
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
 	partition Metrics-608e5cf7-cf60-467a-819d-73714f887b57 = m
 		mode: import
 		source =
