@@ -482,6 +482,14 @@ table Metrics
 
 	measure Status_ordering = sum(Statuses[Index])
 		description: "Sum of status index values for ordering tracking visual elements."
+			                           RETURN _result
+			```
+		displayFolder: Tracking Visual
+		lineageTag: 3a260d98-16ab-4aa1-b4a7-cae39c2c7a7e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Status_ordering = sum(Statuses[Index])
 		displayFolder: Tracking Visual
 		lineageTag: f34018d2-3f83-4a4d-a1b7-3a81a161e5e4
 
