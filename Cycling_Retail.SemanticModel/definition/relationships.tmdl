@@ -60,7 +60,3 @@ relationship 458fc10e-44a0-4200-a4e6-040eecd3b270
 
 	annotation PBI_IsFromSource = FS
 
-relationship 3f95c2c6-e692-1ed6-9a12-90734c45c606
-	fromColumn: Sales.CustomerPONumber
-	toColumn: 'Order Status'.PO
-
