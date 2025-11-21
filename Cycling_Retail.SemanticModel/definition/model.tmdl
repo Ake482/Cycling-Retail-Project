@@ -7,8 +7,6 @@ model Model
 		legacyRedirects
 		returnErrorValuesAsNull
 
-annotation PBIDesktopVersion = 2.138.1452.0 (24.11)
-
 annotation __PBI_TimeIntelligenceEnabled = 0
 
 annotation PBI_QueryOrder = ["Metrics","Selections","Date","Employee","Geography","Product","Product Category","Product Subcategory","Customer","Sales","Reseller","Date (Charts)","Countries","dataset","Path_Param","Server","Database","Order Status","Statuses"]
