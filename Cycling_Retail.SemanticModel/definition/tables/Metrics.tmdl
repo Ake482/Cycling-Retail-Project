@@ -2,12 +2,11 @@ table Metrics
 	lineageTag: d797711d-0272-4a92-92b0-663e2643acd7
 
 	measure 'Total Sales' = SUM('Sales'[Sales Amount])
-		formatString: #,0
 		lineageTag: 986516a7-d8e3-4636-82e8-6f57d9cb9cd0
 
-		changedProperty = FormatString
+		formatStringDefinition = pbi.NumberFormat()
 
-		annotation PBI_FormatHint = {"isDecimal":true}
+		changedProperty = FormatString
 
 	measure 'Total Order Qty' = SUM('Sales'[OrderQuantity])
 		formatString: 0
@@ -182,12 +181,11 @@ table Metrics
 			                              
 			                        RETURN _result
 			```
-		formatString: #,0
 		lineageTag: 81509658-7da2-4aa9-926c-64efebe75422
 
-		changedProperty = FormatString
+		formatStringDefinition = pbi.NumberFormat()
 
-		annotation PBI_FormatHint = {"isDecimal":true}
+		changedProperty = FormatString
 
 	measure Ranking = ```
 			

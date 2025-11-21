@@ -1,0 +1,52 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.3.0/schema.json",
+  "name": "38e2c4d505396c09a046",
+  "position": {
+    "x": 527.65992742353546,
+    "y": 459.71176775531364,
+    "z": 4000,
+    "height": 260.11404872991187,
+    "width": 274.97770865733543,
+    "tabOrder": 4000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Metrics"
+                    }
+                  },
+                  "Property": "Total_Product_Count"
+                }
+              },
+              "queryRef": "Metrics.Total_Product_Count",
+              "nativeQueryRef": "Total_Product_Count"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Date"
+                    }
+                  },
+                  "Property": "Quarters"
+                }
+              },
+              "queryRef": "Date.Quarters",
+              "nativeQueryRef": "Quarters"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,0 +1,15 @@
+function 'pbi.NumberFormat' = ```
+		() =>
+		VAR _value = SELECTEDMEASURE()
+		VAR _absvalue = ABS(_value)
+		VAR _fstr = 
+			SWITCH( TRUE(),
+				SELECTEDMEASURE() >= 1e6 ,"#,##0,,.0 M",        
+				SELECTEDMEASURE() >= 1e3, "#,##0,.0 K", 
+										  "#,##0"
+			)
+			RETURN
+				_fstr
+		```
+	lineageTag: 94d077d0-35d9-4d5a-b857-414299b0309f
+
