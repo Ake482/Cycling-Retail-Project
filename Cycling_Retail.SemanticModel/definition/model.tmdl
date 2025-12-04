@@ -4,12 +4,13 @@ model Model
 	discourageImplicitMeasures
 	sourceQueryCulture: en-GB
 	dataAccessOptions
+		fastCombine
 		legacyRedirects
 		returnErrorValuesAsNull
 
 annotation __PBI_TimeIntelligenceEnabled = 0
 
-annotation PBI_QueryOrder = ["Metrics","Selections","Date","Employee","Geography","Product","Product Category","Product Subcategory","Customer","Sales","Reseller","Date (Charts)","Countries","dataset","Path_Param","Server","Database","Order Status","Statuses"]
+annotation PBI_QueryOrder = ["Metrics","Selections","Date","Employee","Geography","Product","Product Category","Product Subcategory","Customer","Sales","Reseller","Date (Charts)","Countries","dataset","Path_Param","Server","Database","Order Status","Statuses","Sales Forecast"]
 
 annotation __TEdtr = 1
 
@@ -40,6 +41,7 @@ ref table Parameter_Area
 ref table Calendar_Custom
 ref table 'Order Status'
 ref table Statuses
+ref table 'Sales Forecast'
 
 ref role Finance
 ref role 'Human Resources'

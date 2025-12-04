@@ -4,7 +4,7 @@
     {
       "ordinal": 0,
       "scrollPosition": {
-        "x": 1156.6985280890215,
+        "x": 1156.2997918379933,
         "y": 0
       },
       "nodes": [
@@ -325,6 +325,16 @@
             "width": 234
           },
           "zIndex": 4
+        },
+        {
+          "location": {},
+          "nodeIndex": "Sales Forecast",
+          "nodeLineageTag": "ed5b858d-47bd-4f86-9d1f-dbef322e09a8",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 0
         }
       ],
       "name": "All tables",
