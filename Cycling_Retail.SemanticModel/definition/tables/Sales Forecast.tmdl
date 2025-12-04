@@ -1,0 +1,63 @@
+table 'Sales Forecast'
+	lineageTag: ed5b858d-47bd-4f86-9d1f-dbef322e09a8
+
+	column Date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: f5d40159-b5ce-4ae7-b834-c40d2d1831cf
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Forecast
+		dataType: double
+		lineageTag: 990a7ebf-f622-4761-9fb7-97eaa60e1fa0
+		summarizeBy: sum
+		sourceColumn: Forecast
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column LowerBound
+		dataType: double
+		lineageTag: 223ae797-433a-4df4-a583-ef8e0081078c
+		summarizeBy: sum
+		sourceColumn: LowerBound
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column UpperBound
+		dataType: double
+		lineageTag: e10ea771-d431-41db-8a4c-a666e157896d
+		summarizeBy: sum
+		sourceColumn: UpperBound
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Sales Forecast' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("localhost", "AdventureworksDW2017"),
+				    dbo_FactResellerSales = Source{[Schema="dbo",Item="FactResellerSales"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(dbo_FactResellerSales,{{"SalesAmount", Int64.Type}, {"OrderDate", type datetime}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"DimCurrency", "DimDate(DueDateKey)", "DimDate(OrderDateKey)", "DimDate(ShipDateKey)", "DimEmployee", "DimProduct", "DimPromotion", "DimReseller", "DimSalesTerritory"}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"TotalProductCost", "Product Cost"}, {"SalesAmount", "Sales Amount"}}),
+				    #"Run Python script1" = Python.Execute("# 'dataset' holds the input data for this script#(lf)#(lf)import pandas as pd#(lf)from prophet import Prophet#(lf)#(lf)# -------------------------------------------------------#(lf)# 1. CLEAN DATE COLUMN#(lf)# -------------------------------------------------------#(lf)# Convert yyyy-mm-ddT00:00:00 safely into datetime#(lf)dataset['OrderDate'] = pd.to_datetime(dataset['OrderDate'], errors='coerce')#(lf)#(lf)# -------------------------------------------------------#(lf)# 2. CLEAN SALES AMOUNT COLUMN#(lf)# -------------------------------------------------------#(lf)# Remove currency symbols, commas, spaces, and non-numeric chars#(lf)dataset['Sales Amount'] = (#(lf)    dataset['Sales Amount']#(lf)    .astype(str)#(lf)    .str.replace('[^0-9\.-]', '', regex=True)#(lf))#(lf)#(lf)# Convert to float#(lf)dataset['Sales Amount'] = pd.to_numeric(dataset['Sales Amount'], errors='coerce')#(lf)#(lf)# -------------------------------------------------------#(lf)# 3. FILTER CLEAN ROWS#(lf)# -------------------------------------------------------#(lf)df = dataset[['OrderDate', 'Sales Amount']].dropna()#(lf)#(lf)# Prophet requires columns 'ds' (datetime) and 'y' (numeric)#(lf)df['ds'] = df['OrderDate']#(lf)df['y'] = df['Sales Amount']#(lf)#(lf)df = df[['ds', 'y']].dropna()#(lf)#(lf)# -------------------------------------------------------#(lf)# 4. CHECK THERE IS ENOUGH DATA FOR PROPHET#(lf)# -------------------------------------------------------#(lf)if df.shape[0] < 2:#(lf)    raise ValueError(""Not enough valid rows for forecasting after cleaning."")#(lf)#(lf)# -------------------------------------------------------#(lf)# 5. TRAIN PROPHET MODEL#(lf)# -------------------------------------------------------#(lf)model = Prophet(yearly_seasonality=True)#(lf)model.fit(df)#(lf)#(lf)# -------------------------------------------------------#(lf)# 6. CREATE FUTURE PERIODS AND FORECAST#(lf)# -------------------------------------------------------#(lf)future = model.make_future_dataframe(periods=6, freq='M')#(lf)forecast = model.predict(future)#(lf)#(lf)# -------------------------------------------------------#(lf)# 7. FORMAT RESULT FOR POWER BI#(lf)# -------------------------------------------------------#(lf)result = forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]#(lf)result.columns = ['Date', 'Forecast', 'LowerBound', 'UpperBound']#(lf)#(lf)result#(lf)#(lf)",[dataset=#"Renamed Columns"]),
+				    result = #"Run Python script1"{[Name="result"]}[Value],
+				    #"Changed Type1" = Table.TransformColumnTypes(result,{{"Date", type date}, {"Forecast", type number}, {"LowerBound", type number}, {"UpperBound", type number}})
+				in
+				    #"Changed Type1"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
