@@ -1,0 +1,168 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "a5f8f12ab72e1bd9d3a2",
+  "position": {
+    "x": 59.50867306507,
+    "y": 265.08408910803911,
+    "z": 0,
+    "height": 398.52778022365061,
+    "width": 1143.2878400986176,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Data Dictionary"
+                    }
+                  },
+                  "Property": "Type"
+                }
+              },
+              "queryRef": "Data Dictionary.Type",
+              "nativeQueryRef": "Type"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Data Dictionary"
+                    }
+                  },
+                  "Property": "Name"
+                }
+              },
+              "queryRef": "Data Dictionary.Name",
+              "nativeQueryRef": "Name"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Data Dictionary"
+                    }
+                  },
+                  "Property": "Description"
+                }
+              },
+              "queryRef": "Data Dictionary.description",
+              "nativeQueryRef": "Description"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Data Dictionary"
+                    }
+                  },
+                  "Property": "Location"
+                }
+              },
+              "queryRef": "Data Dictionary.Location",
+              "nativeQueryRef": "Location"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Data Dictionary"
+                    }
+                  },
+                  "Property": "Expression"
+                }
+              },
+              "queryRef": "Data Dictionary.Expression",
+              "nativeQueryRef": "Expression"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "26bdd9d3836e9b3fea0d",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Data Dictionary"
+              }
+            },
+            "Property": "Name"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "965d91658044816e3e25",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Data Dictionary"
+              }
+            },
+            "Property": "Type"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "210f784f226c4a848c26",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Data Dictionary"
+              }
+            },
+            "Property": "Description"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f48e115decca21c2f7ab",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Data Dictionary"
+              }
+            },
+            "Property": "Location"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "27a10f05917f9ad91204",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Data Dictionary"
+              }
+            },
+            "Property": "Expression"
+          }
+        },
+        "type": "Categorical"
+      }
+    ]
+  }
+}

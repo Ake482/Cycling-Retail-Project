@@ -182,7 +182,7 @@ table Reseller
 		mode: import
 		source =
 				let
-				    Source = Sql.Database("localhost", "AdventureworksDW2017"),
+				    Source = Sql.Database(Server, Database),
 				    dbo_DimReseller = Source{[Schema="dbo",Item="DimReseller"]}[Data]
 				in
 				    dbo_DimReseller

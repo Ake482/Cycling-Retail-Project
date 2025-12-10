@@ -10,7 +10,7 @@ model Model
 
 annotation __PBI_TimeIntelligenceEnabled = 0
 
-annotation PBI_QueryOrder = ["Metrics","Selections","Date","Employee","Geography","Product","Product Category","Product Subcategory","Customer","Sales","Reseller","Date (Charts)","Countries","dataset","Path_Param","Server","Database","Order Status","Statuses","Sales Forecast"]
+annotation PBI_QueryOrder = ["Metrics","Selections","Date","Employee","Geography","Product","Product Category","Product Subcategory","Customer","Sales","Reseller","Date (Charts)","Countries","dataset","Path_Param","Server","Database","Order Status","Statuses","Sales Forecast","Threshold"]
 
 annotation __TEdtr = 1
 
@@ -42,6 +42,12 @@ ref table Calendar_Custom
 ref table 'Order Status'
 ref table Statuses
 ref table 'Sales Forecast'
+ref table Threshold
+ref table 'Model Measures'
+ref table 'Model Columns'
+ref table 'Model Tables'
+ref table 'Model Relatioships'
+ref table 'Data Dictionary'
 
 ref role Finance
 ref role 'Human Resources'

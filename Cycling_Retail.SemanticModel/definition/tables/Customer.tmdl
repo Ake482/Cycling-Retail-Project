@@ -252,7 +252,7 @@ table Customer
 		mode: import
 		source =
 				let
-				    Source = Sql.Database("localhost", "AdventureworksDW2017"),
+				    Source = Sql.Database(Server, Database),
 				    dbo_DimCustomer = Source{[Schema="dbo",Item="DimCustomer"]}[Data],
 				    #"Removed Columns" = Table.RemoveColumns(dbo_DimCustomer,{"DimGeography", "FactInternetSales", "FactSurveyResponse"})
 				in

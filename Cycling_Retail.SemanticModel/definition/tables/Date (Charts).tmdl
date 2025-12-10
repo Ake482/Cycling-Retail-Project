@@ -147,11 +147,11 @@ table 'Date (Charts)'
 		mode: import
 		source =
 				let
-				    Source = Sql.Database("localhost", "AdventureworksDW2017"),
+				    Source = Sql.Database(Server, Database),
 				    dbo_DimDate = Source{[Schema="dbo",Item="DimDate"]}[Data],
 				    #"Removed Columns" = Table.RemoveColumns(dbo_DimDate,{"FactCallCenter", "FactCurrencyRate", "FactFinance", "FactInternetSales(DateKey)", "FactInternetSales(DateKey) 2", "FactInternetSales(DateKey) 3", "FactProductInventory", "FactResellerSales(DateKey)", "FactResellerSales(DateKey) 2", "FactResellerSales(DateKey) 3", "FactSalesQuota", "FactSurveyResponse", "SpanishDayNameOfWeek", "FrenchDayNameOfWeek", "SpanishMonthName", "FrenchMonthName", "FiscalQuarter", "FiscalYear", "FiscalSemester"}),
 				    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"WeekNumberOfYear", "Week"}, {"FullDateAlternateKey", "Date"}, {"DayNumberOfWeek", "Day Number Of Week"}, {"EnglishDayNameOfWeek", "Day Name"}, {"DayNumberOfMonth", "Day Number Of Month"}, {"DayNumberOfYear", "Day Number Of Year"}, {"EnglishMonthName", "Month"}, {"MonthNumberOfYear", "Month Number"}, {"CalendarQuarter", "Quarter"}, {"CalendarYear", "Year"}, {"CalendarSemester", "Semester"}}),
-				    #"Filtered Rows" = Table.SelectRows(#"Renamed Columns", each ([Year] = 2011 or [Year] = 2012 or [Year] = 2013))
+				    #"Filtered Rows" = Table.SelectRows(#"Renamed Columns", each ([Year] = 2010 or [Year] = 2011 or [Year] = 2012 or [Year] = 2013 or [Year] = 2014 or [Year]= 2015))
 				in
 				    #"Filtered Rows"
 

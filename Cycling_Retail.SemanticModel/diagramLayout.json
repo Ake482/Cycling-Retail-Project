@@ -4,8 +4,8 @@
     {
       "ordinal": 0,
       "scrollPosition": {
-        "x": 1156.2997918379933,
-        "y": 0
+        "x": 9238.436729029605,
+        "y": 267.14511670564349
       },
       "nodes": [
         {
@@ -327,11 +327,87 @@
           "zIndex": 4
         },
         {
-          "location": {},
+          "location": {
+            "x": 170.76315789473824,
+            "y": 1023.832459150432
+          },
           "nodeIndex": "Sales Forecast",
           "nodeLineageTag": "ed5b858d-47bd-4f86-9d1f-dbef322e09a8",
           "size": {
             "height": 176,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 8304.7631578947367,
+            "y": 572.23435477388989
+          },
+          "nodeIndex": "Threshold",
+          "nodeLineageTag": "fcc0a7d0-ff92-4766-934c-82cac83073bc",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 8588.7631578947367,
+            "y": 536.23435477388989
+          },
+          "nodeIndex": "Model Measures",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 8872.7631578947367,
+            "y": 536.23435477388989
+          },
+          "nodeIndex": "Model Columns",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 9156.7631578947367,
+            "y": 536.23435477388989
+          },
+          "nodeIndex": "Model Tables",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 9440.7631578947367,
+            "y": 536.23435477388989
+          },
+          "nodeIndex": "Model Relatioships",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 9724.7631578947367,
+            "y": 536.23435477388989
+          },
+          "nodeIndex": "Data Dictionary",
+          "size": {
+            "height": 200,
             "width": 234
           },
           "zIndex": 0

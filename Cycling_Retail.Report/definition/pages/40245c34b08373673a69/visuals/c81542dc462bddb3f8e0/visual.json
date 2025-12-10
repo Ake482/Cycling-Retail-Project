@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "c81542dc462bddb3f8e0",
+  "position": {
+    "x": 937.79742456275233,
+    "y": 185.98500864885645,
+    "z": 1001,
+    "height": 129.89429175475689,
+    "width": 191.88929463770904,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Metrics"
+                    }
+                  },
+                  "Property": "SVG Timeline"
+                }
+              },
+              "queryRef": "Metrics.SVG Timeline",
+              "nativeQueryRef": "SVG Timeline"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

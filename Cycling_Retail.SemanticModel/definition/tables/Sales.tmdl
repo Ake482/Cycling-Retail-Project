@@ -269,7 +269,7 @@ table Sales
 		mode: import
 		source =
 				let
-				    Source = Sql.Database("localhost", "AdventureworksDW2017"),
+				    Source = Sql.Database(Server, Database),
 				    dbo_FactResellerSales = Source{[Schema="dbo",Item="FactResellerSales"]}[Data],
 				    #"Changed Type" = Table.TransformColumnTypes(dbo_FactResellerSales,{{"SalesAmount", Currency.Type}, {"OrderDate", type datetime}}),
 				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"DimCurrency", "DimDate(DueDateKey)", "DimDate(OrderDateKey)", "DimDate(ShipDateKey)", "DimEmployee", "DimProduct", "DimPromotion", "DimReseller", "DimSalesTerritory"}),

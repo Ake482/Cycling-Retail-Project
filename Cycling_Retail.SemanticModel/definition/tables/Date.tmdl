@@ -29,7 +29,7 @@ table Date
 		dataType: int64
 		formatString: 0
 		lineageTag: 9dc3e788-dd41-4466-b751-f1a2afa6993e
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: Day Number Of Week
 
 		annotation SummarizationSetBy = Automatic
@@ -46,7 +46,7 @@ table Date
 		dataType: int64
 		formatString: 0
 		lineageTag: 4a197e7f-81b0-4e6d-9e88-8010bbcf4513
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: Day Number Of Month
 
 		annotation SummarizationSetBy = Automatic
@@ -55,7 +55,7 @@ table Date
 		dataType: int64
 		formatString: 0
 		lineageTag: 84ede537-8ce3-4124-b3fd-3a89f0b1a8d1
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: Day Number Of Year
 
 		annotation SummarizationSetBy = Automatic
@@ -64,7 +64,7 @@ table Date
 		dataType: int64
 		formatString: 0
 		lineageTag: a228701b-5a3a-4ad6-ab1a-64c02d6a271a
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: Week
 
 		annotation SummarizationSetBy = Automatic
@@ -81,7 +81,7 @@ table Date
 		dataType: int64
 		formatString: 0
 		lineageTag: 7916017f-9405-4477-ac49-3e6958937654
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: Month Number
 
 		changedProperty = FormatString
@@ -92,7 +92,7 @@ table Date
 		dataType: int64
 		formatString: 0
 		lineageTag: bf06de97-9466-4f22-b220-14128021e51f
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: Quarter
 
 		annotation SummarizationSetBy = Automatic
@@ -101,7 +101,7 @@ table Date
 		dataType: int64
 		formatString: 0
 		lineageTag: 5b5d5719-3ee4-4472-8ff3-0ef103fb5531
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: Year
 
 		annotation SummarizationSetBy = Automatic
@@ -110,7 +110,7 @@ table Date
 		dataType: int64
 		formatString: 0
 		lineageTag: be88e30e-d0c1-4bd1-b019-339d5bbb448f
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: Semester
 
 		annotation SummarizationSetBy = Automatic
@@ -149,11 +149,11 @@ table Date
 		mode: import
 		source =
 				let
-				    Source = Sql.Database("localhost", "AdventureworksDW2017"),
+				    Source = Sql.Database(Server, Database),
 				    dbo_DimDate = Source{[Schema="dbo",Item="DimDate"]}[Data],
 				    #"Removed Columns" = Table.RemoveColumns(dbo_DimDate,{"FactCallCenter", "FactCurrencyRate", "FactFinance", "FactInternetSales(DateKey)", "FactInternetSales(DateKey) 2", "FactInternetSales(DateKey) 3", "FactProductInventory", "FactResellerSales(DateKey)", "FactResellerSales(DateKey) 2", "FactResellerSales(DateKey) 3", "FactSalesQuota", "FactSurveyResponse", "SpanishDayNameOfWeek", "FrenchDayNameOfWeek", "SpanishMonthName", "FrenchMonthName", "FiscalQuarter", "FiscalYear", "FiscalSemester"}),
 				    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"WeekNumberOfYear", "Week"}, {"FullDateAlternateKey", "Date"}, {"DayNumberOfWeek", "Day Number Of Week"}, {"EnglishDayNameOfWeek", "Day Name"}, {"DayNumberOfMonth", "Day Number Of Month"}, {"DayNumberOfYear", "Day Number Of Year"}, {"EnglishMonthName", "Month"}, {"MonthNumberOfYear", "Month Number"}, {"CalendarQuarter", "Quarter"}, {"CalendarYear", "Year"}, {"CalendarSemester", "Semester"}}),
-				    #"Filtered Rows" = Table.SelectRows(#"Renamed Columns", each ([Year] = 2011 or [Year] = 2012 or [Year] = 2013))
+				    #"Filtered Rows" = Table.SelectRows(#"Renamed Columns", each ([Year] = 2010 or [Year] = 2011 or [Year] = 2012 or [Year] = 2013 or [Year] = 2014 or [Year]= 2015))
 				in
 				    #"Filtered Rows"
 

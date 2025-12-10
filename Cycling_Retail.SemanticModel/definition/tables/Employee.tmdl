@@ -219,15 +219,6 @@ table Employee
 
 		annotation SummarizationSetBy = Automatic
 
-	column SalesPersonFlag
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: 332880f7-f63b-4df8-b07d-ca09722fa3e7
-		summarizeBy: none
-		sourceColumn: SalesPersonFlag
-
-		annotation SummarizationSetBy = Automatic
-
 	column DepartmentName
 		dataType: string
 		lineageTag: 18761d9b-3681-4a48-be2f-e17142d870e6
@@ -263,6 +254,15 @@ table Employee
 		lineageTag: 4ed2ce4e-d794-4f0d-96cc-412a170afb6b
 		summarizeBy: none
 		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column SalesPersonFlag
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 6e338157-c772-490d-b17c-ce2dd5786d32
+		summarizeBy: none
+		sourceColumn: SalesPersonFlag
 
 		annotation SummarizationSetBy = Automatic
 

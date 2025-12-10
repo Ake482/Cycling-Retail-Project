@@ -56,7 +56,7 @@ table 'Product Subcategory'
 		mode: import
 		source =
 				let
-				    Source = Sql.Database("localhost", "AdventureworksDW2017"),
+				    Source = Sql.Database(Server, Database),
 				    dbo_DimProductSubcategory = Source{[Schema="dbo",Item="DimProductSubcategory"]}[Data],
 				    #"Removed Columns" = Table.RemoveColumns(dbo_DimProductSubcategory,{"DimProduct", "DimProductCategory"})
 				in
