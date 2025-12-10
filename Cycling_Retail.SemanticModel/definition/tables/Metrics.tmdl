@@ -1,8 +1,8 @@
 table Metrics
 	lineageTag: d797711d-0272-4a92-92b0-663e2643acd7
 
+	/// Total sum of sales
 	measure 'Total Sales' = SUM('Sales'[Sales Amount])
-		description = "Sum of all sales amounts from the Sales table, representing total revenue"
 		lineageTag: 986516a7-d8e3-4636-82e8-6f57d9cb9cd0
 
 		formatStringDefinition = pbi.NumberFormat()
@@ -10,24 +10,20 @@ table Metrics
 		changedProperty = FormatString
 
 	measure 'Total Order Qty' = SUM('Sales'[OrderQuantity])
-		description = "Sum of all order quantities, representing total units sold"
 		formatString: 0
 		lineageTag: 23303d6b-c8f9-441b-8600-bb9e3c02cf0d
 
 	measure 'Total Cost' = SUM('Sales'[Product Cost])
-		description = "Sum of all product costs from the Sales table, representing total cost of goods"
 		formatString: #,0.00
 		lineageTag: fc1c2294-8b5f-4a04-b194-5c21734ba2ba
 
 	measure 'Total Price' = SUM('Sales'[UnitPrice])
-		description = "Sum of all unit prices from the Sales table"
 		formatString: "£"#,0.###############;-"£"#,0.###############;"£"#,0.###############
 		lineageTag: d859059a-19be-436b-a449-cb82e09ff68a
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-GB"}
 
 	measure 'Selected Year' = SELECTEDVALUE('Date'[Year])
-		description = "Currently selected year value from the Date dimension for filtering context"
 		lineageTag: 7b1b9e68-adef-4945-944f-92133a50d9db
 
 		formatStringDefinition = "#"
@@ -35,21 +31,18 @@ table Metrics
 		changedProperty = IsHidden
 
 	measure 'Sales Projection' = [Total Sales] * 'Sales projection 2'[Sales projection Value 2]
-		description = "Projected sales calculated by multiplying current total sales by the projection multiplier"
 		formatString: "£"#,0.###############;-"£"#,0.###############;"£"#,0.###############
 		lineageTag: ec65988b-d596-4b4a-8551-7bb9c25f818a
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-GB"}
 
 	measure KPI = if (HASONEFILTER(Product[Name]), UNICHAR(11044), BLANK())
-		description = "Conditional KPI indicator showing a check mark when a single product is selected"
 		lineageTag: 3376935f-2f51-4b23-990f-51134747835a
 
 	measure 'Total Prior Sales' = ```
-			description = "Sales from the prior period (previous month or quarter) based on Time Selection parameter"
 			
-		                                                                       
-		                    VAR _result = SWITCH( TRUE()
+			                                                                       
+			                    VAR _result = SWITCH( TRUE()
 			                                           ,SELECTEDVALUE('Time Selection'[Time Selection Value]) = "Quarters", [_priorquartersales]
 			                                           ,SELECTEDVALUE('Time Selection'[Time Selection Value]) = "Months" , [_priormonthsales]
 			                                           ,BLANK()
@@ -63,10 +56,9 @@ table Metrics
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure _priormonthsales =
-			description = "Total sales from the previous month, used as internal helper measure"
 			CALCULATE(
-		                               [Total Sales],
-		        PREVIOUSMONTH('Date'[Date])
+			                               [Total Sales],
+			        PREVIOUSMONTH('Date'[Date])
 			    )
 		formatString: "£"#,0.###############;-"£"#,0.###############;"£"#,0.###############
 		lineageTag: e8fbf3c6-819a-4c17-b0d3-c0c53078900a
@@ -74,9 +66,8 @@ table Metrics
 		annotation PBI_FormatHint = {"currencyCulture":"en-GB"}
 
 	measure _priorquartersales = ```
-			description = "Total sales from the prior quarters based on the Last N Parameter, used as internal helper measure"
 			
-		                        VAR _maxdate = MAX('Date'[Date])
+			                        VAR _maxdate = MAX('Date'[Date])
 			                   -- VAR _mindate = 
 			                    VAR _result = 
 			                                      CALCULATE( 
@@ -98,9 +89,8 @@ table Metrics
 		annotation PBI_FormatHint = {"currencyCulture":"en-GB"}
 
 	measure 'Total Sales revenue - Last N months' = ```
-			description = "Total sales revenue for the last N months specified in the Last N Parameter, displayed in millions"
 			
-		                                        VAR _selecteddate = MAX('Date'[Date])
+			                                        VAR _selecteddate = MAX('Date'[Date])
 			                                        VAR _monthsago = EOMONTH(_selecteddate, - 'Last N Parameter'[Last N Parameter Value]-1)
 			                                        VAR _result = 
 			                                                     IF( 
@@ -123,9 +113,8 @@ table Metrics
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure 'Total Product Cost - Last N months' = ```
-			description = "Total product cost for the last N months specified in the Last N Parameter, displayed in millions"
 			
-		                                        VAR _selecteddate = MAX('Date'[Date])
+			                                        VAR _selecteddate = MAX('Date'[Date])
 			                                        VAR _monthsago = EOMONTH(_selecteddate, - 'Last N Parameter'[Last N Parameter Value]-1)
 			                                        VAR _result = 
 			                                                     IF( 
@@ -147,9 +136,8 @@ table Metrics
 		lineageTag: a50606c8-b919-47be-b106-d70cd301cdab
 
 	measure Threshold_RAG = ```
-			description = "Red-Amber-Green (RAG) status indicator comparing sales and cost metrics against defined thresholds"
 			
-		            VAR _SalesLowerThreshold = MAXX(FILTER(Threshold,Threshold[Description] = "Sales_Lower"),Threshold[Value])
+			            VAR _SalesLowerThreshold = MAXX(FILTER(Threshold,Threshold[Description] = "Sales_Lower"),Threshold[Value])
 			            VAR _SalesUpperThreshold = MAXX(FILTER(Threshold,Threshold[Description] = "Sales_Upper"),Threshold[Value])
 			            VAR _CostLowerThreshold = MAXX(FILTER(Threshold,Threshold[Description] = "Cost_Lower"),Threshold[Value])
 			            VAR _CostUpperThreshold = MAXX(FILTER(Threshold,Threshold[Description] = "Cost_Upper"),Threshold[Value])
@@ -178,9 +166,8 @@ table Metrics
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure 'Sales Revenue Ranking' = ```
-			description = "Total sales filtered by top-ranked product subcategories based on the Ranking parameter"
 			
-		            VAR _ranking = [Ranking]
+			            VAR _ranking = [Ranking]    
 			            VAR _products = VALUES('Product Subcategory'[EnglishProductSubcategoryName])
 			            VAR _result = 
 			                         
@@ -202,10 +189,9 @@ table Metrics
 		changedProperty = FormatString
 
 	measure Ranking = ```
-			description = "Selected ranking value for top N analysis, defaults to a large number if not filtered"
 			
-		            IF( HASONEVALUE('Rank'[Rank])
-		                , VALUES('Rank'[Rank])
+			            IF( HASONEVALUE('Rank'[Rank])
+			                , VALUES('Rank'[Rank])
 			                ,99999999999999
 			            )
 			```
@@ -213,19 +199,16 @@ table Metrics
 		lineageTag: 7ae5dfd9-b437-42f6-afbc-4bdb24fca23b
 
 	measure sales_revenue_monthly_variance = (DIVIDE([Total Sales],[_priormonthsales],0) - 1 ) *100
-		description = "Month-over-month percentage change in sales revenue"
 		lineageTag: 9896a969-b1bb-4c30-9425-efa334ac11f8
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure 'Cumulative Revenue' = CALCULATE ([Total Sales], FILTER (ALL ('Date'), 'Date'[Date] <= MAX ('Date'[Date])))/1000000
-		description = "Cumulative total sales from start of period to the selected date, displayed in millions"
 		lineageTag: d311c362-37b4-4131-84d9-ecfac4c386bf
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure selected_metric = SELECTEDVALUE('Financials Parameter'[Param values])
-		description = "Currently selected financial metric parameter value for conditional measure display"
 		isHidden
 		lineageTag: aaad2b1a-dfd1-4880-9b51-ee51606e7e9f
 
@@ -234,13 +217,11 @@ table Metrics
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure Total_Product_Count = COUNTA('Sales'[ProductKey])
-		description = "Count of distinct products sold in the Sales table"
 		lineageTag: 23a4eb3d-9503-406e-b91d-c83577ed6b23
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure selected_rank = "Top "&SELECTEDVALUE('Rank'[Rank])&" selling products"
-		description = "Display label for the currently selected ranking parameter value"
 		isHidden
 		lineageTag: 904544f0-ab54-4baa-9110-2a5e5207573e
 
@@ -249,9 +230,8 @@ table Metrics
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure 'Total Sales CY' = ```
-			description = "Total sales for the current year based on the selected year filter"
 			
-		VAR _val = CALCULATE(
+			VAR _val = CALCULATE(
 			                            [Total Sales],
 			                            'Date'[Year] = SELECTEDVALUE('Date'[Year])
 			                    )
@@ -262,7 +242,7 @@ table Metrics
 		lineageTag: c4f86ed6-b028-420b-9203-075c338566cc
 
 	measure 'Measure_test%Of Total' = ```
-			description = "Test measure calculating percentage of total for Bikes category"
+			
 			
 			var Grand_Tot = CALCULATE(
 			                            COUNT('Sales'[CustomerPONumber]),
@@ -281,9 +261,8 @@ table Metrics
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure SVG = ```
-			description = "SVG image of SQL BI logo for visual branding in reports"
 			
-		     "data:image/svg+xml;utf8,<svg version=""1.1"" id=""Layer_1"" xmlns=""http://www.w3.org/2000/svg"" xmlns:xlink=""http://www.w3.org/1999/xlink"" x=""0px"" y=""0px""
+			     "data:image/svg+xml;utf8,<svg version=""1.1"" id=""Layer_1"" xmlns=""http://www.w3.org/2000/svg"" xmlns:xlink=""http://www.w3.org/1999/xlink"" x=""0px"" y=""0px""
 				 width=""1500px"" height=""500px"" viewBox=""0 0 1500 500"" style=""enable-background:new 0 0 1500 500;"" xml:space=""preserve"">
 			<style type=""text/css"">
 				.st0{fill:#EB5E5E;}
@@ -326,10 +305,9 @@ table Metrics
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure 'SVG Donught' = ```
-			description = "SVG donut chart visualization showing percentage completion with color coding (green/orange/red)"
 			
-		            
-		// **********************************************************************
+			            
+			// **********************************************************************
 			// input parameters
 			// Background Circle: represents percentage of current achievements (100% means everything is done)
 			var ShowBackGrndCircle = TRUE()
@@ -421,7 +399,7 @@ table Metrics
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure 'SVG Timeline' = ```
-			description = "SVG timeline visualization comparing actual against target values with status indicator"
+			
 			
 			VAR _actual = 150
 			VAR _target = 230
@@ -459,16 +437,14 @@ table Metrics
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure _Dummy-Line = 1
-		description = "Dummy measure used as helper for order tracking visualization"
 		displayFolder: Tracking Visual
 		lineageTag: 0aebf1d4-a55c-45f7-8c18-14b9bfb465b7
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure Tracking_Pos = ```
-			description = "Position indicator for order tracking visualization showing progress through statuses"
 			
-		                VAR _selected_status = SELECTEDVALUE('Order Status'[Status])
+			                VAR _selected_status = SELECTEDVALUE('Order Status'[Status])
 			                VAR _selected_status_num = 
 			                                        CALCULATE(
 			                                                    MAX(Statuses[Index])
@@ -489,16 +465,14 @@ table Metrics
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure Status_ordering = sum(Statuses[Index])
-		description = "Sum of status index values for ordering tracking visuals"
 		displayFolder: Tracking Visual
 		lineageTag: f34018d2-3f83-4a4d-a1b7-3a81a161e5e4
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure Threshold_Lower = ```
-			description = "Lower threshold value for KPI alerts, context-aware based on selected financial parameter"
 			
-		            IF(
+			            IF(
 			                SELECTEDVALUE('Financials Parameter'[Financials Parameter Fields])= [Total Product Cost - Last N months], MINX(FILTER(Threshold,Threshold[Description] = "Cost_Upper"),Threshold[Value]),
 			                 MAXX(FILTER(Threshold,Threshold[Description] = "Sales_Lower"),Threshold[Value])
 			                
@@ -508,9 +482,8 @@ table Metrics
 		lineageTag: dfe86031-3e9b-4654-aa2d-b46c6e3a5af5
 
 	measure Threshold_Upper = ```
-			description = "Upper threshold value for KPI alerts, context-aware based on selected sales or cost metric"
 			
-		            SWITCH(
+			            SWITCH( 
 			                  TRUE(),
 			                ISSELECTEDMEASURE([Total Product Cost - Last N months]), MAXX(FILTER(Threshold,Threshold[Description] = "Cost_Lower"),Threshold[Value]),
 			                ISSELECTEDMEASURE([Total Sales revenue - Last N months]), MAXX(FILTER(Threshold,Threshold[Description] = "Sales_Upper"),Threshold[Value])
@@ -521,24 +494,21 @@ table Metrics
 		lineageTag: ccfaede6-4c12-4c95-b38b-c5a5437ebb5c
 
 	measure 'Total Sales Previous Year' =
-			description = "Total sales from the previous year for year-over-year comparison"
 			CALCULATE(
-		                            [Total Sales],
-		                            'Date'[Year] = SELECTEDVALUE('Date'[Year]) - 1
+			                            [Total Sales],
+			                            'Date'[Year] = SELECTEDVALUE('Date'[Year]) - 1
 			                    )
 		formatString: 0.0
 		lineageTag: 4c3e89b7-7f13-445f-9a5b-5d3611faad66
 
 	measure 'KPI Title' = "Total Sales " & FORMAT(SELECTEDVALUE('Date'[Year]),"#")
-		description = "Dynamic title for KPI card displaying total sales for the selected year"
 		lineageTag: 0a4c2970-f429-4c59-aed9-974a117bf657
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure Growth = ```
-			description = "Year-over-year growth percentage with directional arrow indicator (▲ or ▼)"
 			
-		    var _gr = FORMAT(
+			    var _gr = FORMAT(
 			                    1-DIVIDE([Total Sales CY] , [Total Sales Previous Year]),
 			                    "#.#%"
 			                    )
@@ -553,12 +523,10 @@ table Metrics
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure Total_Sales_trend = [Total Sales CY] -[Total Sales Previous Year]
-		description = "Year-over-year sales trend showing the difference between current and previous year sales"
 		formatString: 0
 		lineageTag: 8af576d3-a0c8-4f55-bcc9-40da9d07584f
 
 	measure 'Total sales Forecast' = SUM('Sales Forecast'[Forecast])*1000
-		description = "Forecasted sales from the Sales Forecast table, multiplied by 1000 for scaling"
 		lineageTag: 730aa254-f9b3-4896-848a-93f791190735
 
 		formatStringDefinition = pbi.NumberFormat()
