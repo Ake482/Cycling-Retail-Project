@@ -19,8 +19,13 @@ table 'Time  Period'
 		calculationItem Growth = ```
 				VAR CY = selectedmeasure()
 				VAR delta = SELECTEDMEASURE () - CALCULATE ( SELECTEDMEASURE (), SAMEPERIODLASTYEAR ( 'Date'[Date] ) )
-				VAR result = divide(delta,CY,blank())
-				RETURN result
+				VAR result = FORMAT(divide(delta,CY,blank()),"#.#%")
+				RETURN 
+				        if ( delta > 0, result&"▲",
+				               IF(delta < 0,result&"▼",
+				                "●"
+				                    )
+				                )
 				
 				```
 

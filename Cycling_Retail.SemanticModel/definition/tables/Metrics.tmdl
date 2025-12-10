@@ -1,6 +1,7 @@
 table Metrics
 	lineageTag: d797711d-0272-4a92-92b0-663e2643acd7
 
+	/// Total sum of sales 1
 	measure 'Total Sales' = SUM('Sales'[Sales Amount])
 		lineageTag: 986516a7-d8e3-4636-82e8-6f57d9cb9cd0
 
@@ -8,36 +9,43 @@ table Metrics
 
 		changedProperty = FormatString
 
+	/// Total sum of order quantities
 	measure 'Total Order Qty' = SUM('Sales'[OrderQuantity])
 		formatString: 0
 		lineageTag: 23303d6b-c8f9-441b-8600-bb9e3c02cf0d
 
+	/// Total sum of product costs
 	measure 'Total Cost' = SUM('Sales'[Product Cost])
 		formatString: #,0.00
 		lineageTag: fc1c2294-8b5f-4a04-b194-5c21734ba2ba
 
+	/// Total sum of unit prices
 	measure 'Total Price' = SUM('Sales'[UnitPrice])
 		formatString: "£"#,0.###############;-"£"#,0.###############;"£"#,0.###############
 		lineageTag: d859059a-19be-436b-a449-cb82e09ff68a
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-GB"}
 
+	/// Returns the selected year from the Date dimension
 	measure 'Selected Year' = SELECTEDVALUE('Date'[Year])
-		formatString: 0
-		isHidden
 		lineageTag: 7b1b9e68-adef-4945-944f-92133a50d9db
+
+		formatStringDefinition = "#"
 
 		changedProperty = IsHidden
 
+	/// Projected sales based on total sales multiplied by projection factor
 	measure 'Sales Projection' = [Total Sales] * 'Sales projection 2'[Sales projection Value 2]
 		formatString: "£"#,0.###############;-"£"#,0.###############;"£"#,0.###############
 		lineageTag: ec65988b-d596-4b4a-8551-7bb9c25f818a
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-GB"}
 
+	/// Key Performance Indicator symbol display
 	measure KPI = if (HASONEFILTER(Product[Name]), UNICHAR(11044), BLANK())
 		lineageTag: 3376935f-2f51-4b23-990f-51134747835a
 
+	/// Total sales from previous period (quarters or months)
 	measure 'Total Prior Sales' = ```
 			
 			                                                                       
@@ -54,19 +62,21 @@ table Metrics
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Total sales from the previous month
 	measure _priormonthsales =
 			CALCULATE(
-			                               [Total Sales],
-			        PREVIOUSMONTH('Date'[Date])
+		                               [Total Sales],
+		        PREVIOUSMONTH('Date'[Date])
 			    )
 		formatString: "£"#,0.###############;-"£"#,0.###############;"£"#,0.###############
 		lineageTag: e8fbf3c6-819a-4c17-b0d3-c0c53078900a
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-GB"}
 
+	/// Total sales from the previous quarter
 	measure _priorquartersales = ```
 			
-			                        VAR _maxdate = MAX('Date'[Date])
+		                        VAR _maxdate = MAX('Date'[Date])
 			                   -- VAR _mindate = 
 			                    VAR _result = 
 			                                      CALCULATE( 
@@ -87,9 +97,10 @@ table Metrics
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-GB"}
 
+	/// Total sales revenue for the last N months
 	measure 'Total Sales revenue - Last N months' = ```
 			
-			                                        VAR _selecteddate = MAX('Date'[Date])
+		                                        VAR _selecteddate = MAX('Date'[Date])
 			                                        VAR _monthsago = EOMONTH(_selecteddate, - 'Last N Parameter'[Last N Parameter Value]-1)
 			                                        VAR _result = 
 			                                                     IF( 
@@ -111,9 +122,10 @@ table Metrics
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Total product cost for the last N months
 	measure 'Total Product Cost - Last N months' = ```
 			
-			                                        VAR _selecteddate = MAX('Date'[Date])
+		                                        VAR _selecteddate = MAX('Date'[Date])
 			                                        VAR _monthsago = EOMONTH(_selecteddate, - 'Last N Parameter'[Last N Parameter Value]-1)
 			                                        VAR _result = 
 			                                                     IF( 
@@ -134,12 +146,13 @@ table Metrics
 		formatString: #,0.00
 		lineageTag: a50606c8-b919-47be-b106-d70cd301cdab
 
-	measure Threshold = ```
+	/// Red-Amber-Green (RAG) status based on threshold comparisons
+	measure Threshold_RAG = ```
 			
-			            VAR _SalesLowerThreshold = 1.7
-			            VAR _SalesUpperThreshold = 2.5
-			            VAR _CostLowerThreshold = 1
-			            VAR _CostUpperThreshold = 2
+		            VAR _SalesLowerThreshold = MAXX(FILTER(Threshold,Threshold[Description] = "Sales_Lower"),Threshold[Value])
+			            VAR _SalesUpperThreshold = MAXX(FILTER(Threshold,Threshold[Description] = "Sales_Upper"),Threshold[Value])
+			            VAR _CostLowerThreshold = MAXX(FILTER(Threshold,Threshold[Description] = "Cost_Lower"),Threshold[Value])
+			            VAR _CostUpperThreshold = MAXX(FILTER(Threshold,Threshold[Description] = "Cost_Upper"),Threshold[Value])
 			            VAR _salesrevenue = [Total Sales revenue - Last N months]
 			            VAR _result =            
 			                            IF( SELECTEDVALUE('Financials Parameter'[Param values]) = "Sales Revenue"
@@ -164,9 +177,10 @@ table Metrics
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Ranking of products by sales revenue
 	measure 'Sales Revenue Ranking' = ```
 			
-			            VAR _ranking = [Ranking]    
+	            VAR _ranking = [Ranking]
 			            VAR _products = VALUES('Product Subcategory'[EnglishProductSubcategoryName])
 			            VAR _result = 
 			                         
@@ -187,9 +201,10 @@ table Metrics
 
 		changedProperty = FormatString
 
+	/// Returns the selected ranking value or maximum if not filtered
 	measure Ranking = ```
 			
-			            IF( HASONEVALUE('Rank'[Rank])
+	            IF( HASONEVALUE('Rank'[Rank])
 			                , VALUES('Rank'[Rank])
 			                ,99999999999999
 			            )
@@ -197,16 +212,19 @@ table Metrics
 		formatString: 0
 		lineageTag: 7ae5dfd9-b437-42f6-afbc-4bdb24fca23b
 
+	/// Percentage variance in sales revenue compared to prior month
 	measure sales_revenue_monthly_variance = (DIVIDE([Total Sales],[_priormonthsales],0) - 1 ) *100
 		lineageTag: 9896a969-b1bb-4c30-9425-efa334ac11f8
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Cumulative total sales revenue up to the current date
 	measure 'Cumulative Revenue' = CALCULATE ([Total Sales], FILTER (ALL ('Date'), 'Date'[Date] <= MAX ('Date'[Date])))/1000000
 		lineageTag: d311c362-37b4-4131-84d9-ecfac4c386bf
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Selected financial metric from the Financials Parameter
 	measure selected_metric = SELECTEDVALUE('Financials Parameter'[Param values])
 		isHidden
 		lineageTag: aaad2b1a-dfd1-4880-9b51-ee51606e7e9f
@@ -215,11 +233,13 @@ table Metrics
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Total count of unique products in sales
 	measure Total_Product_Count = COUNTA('Sales'[ProductKey])
 		lineageTag: 23a4eb3d-9503-406e-b91d-c83577ed6b23
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Text display for selected rank filter
 	measure selected_rank = "Top "&SELECTEDVALUE('Rank'[Rank])&" selling products"
 		isHidden
 		lineageTag: 904544f0-ab54-4baa-9110-2a5e5207573e
@@ -228,21 +248,20 @@ table Metrics
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure Measure_test =
-			SUMX(
-			    SUMMARIZECOLUMNS(
-					'Product Subcategory'[EnglishProductSubcategoryName],
-					FILTER(
-						'Product Category',
-						'Product Category'[Category] = "Bikes"
-					),
-					" Total PO ", COUNT('Sales'[CustomerPONumber]))
-			            ,[ Total PO ]
-			            )
+	/// Total sales for the current year
+	measure 'Total Sales CY' = ```
+			
+		VAR _val = CALCULATE(
+		                            [Total Sales],
+		                            'Date'[Year] = SELECTEDVALUE('Date'[Year])
+			                    )
+			RETURN 
+			   _val
+			```
+		formatString: 0.0
 		lineageTag: c4f86ed6-b028-420b-9203-075c338566cc
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
+	/// Test measure calculating percentage of total
 	measure 'Measure_test%Of Total' = ```
 			
 			
@@ -255,16 +274,17 @@ table Metrics
 			                             ALLSELECTED()  
 			                       )
 			                       RETURN
-			                       DIVIDE([Measure_test],Grand_Tot,0)
+			                       DIVIDE([Total Sales CY],Grand_Tot,0)
 			                      -- FORMAT(DIVIDE([Measure_test],Grand_Tot,0),"#.#%")
 			```
 		lineageTag: cf21a781-3e2f-4680-8c83-0642b9a490bd
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// SQL BI logo as SVG image
 	measure SVG = ```
 			
-			     "data:image/svg+xml;utf8,<svg version=""1.1"" id=""Layer_1"" xmlns=""http://www.w3.org/2000/svg"" xmlns:xlink=""http://www.w3.org/1999/xlink"" x=""0px"" y=""0px""
+		     "data:image/svg+xml;utf8,<svg version=""1.1"" id=""Layer_1"" xmlns=""http://www.w3.org/2000/svg"" xmlns:xlink=""http://www.w3.org/1999/xlink"" x=""0px"" y=""0px""
 				 width=""1500px"" height=""500px"" viewBox=""0 0 1500 500"" style=""enable-background:new 0 0 1500 500;"" xml:space=""preserve"">
 			<style type=""text/css"">
 				.st0{fill:#EB5E5E;}
@@ -306,12 +326,13 @@ table Metrics
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Donut chart as SVG visualization
 	measure 'SVG Donught' = ```
 			
-			            
-			// **********************************************************************
-			// input parameters
-			// Background Circle: represents percentage of current achievements (100% means everything is done)
+		            
+		// **********************************************************************
+		// input parameters
+		// Background Circle: represents percentage of current achievements (100% means everything is done)
 			var ShowBackGrndCircle = TRUE()
 			var BackGrndPercent = [Measure_test%Of Total] // value has to be >= 0 and <=1
 			// using Firefox one has to use "%23" instead of the "#"-sign
@@ -400,6 +421,7 @@ table Metrics
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Timeline visualization as SVG image
 	measure 'SVG Timeline' = ```
 			
 			
@@ -438,15 +460,17 @@ table Metrics
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Dummy measure for tracking visual display
 	measure _Dummy-Line = 1
 		displayFolder: Tracking Visual
 		lineageTag: 0aebf1d4-a55c-45f7-8c18-14b9bfb465b7
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Tracking position based on order status
 	measure Tracking_Pos = ```
 			
-			                VAR _selected_status = SELECTEDVALUE('Order Status'[Status])
+		                VAR _selected_status = SELECTEDVALUE('Order Status'[Status])
 			                VAR _selected_status_num = 
 			                                        CALCULATE(
 			                                                    MAX(Statuses[Index])
@@ -466,11 +490,80 @@ table Metrics
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Status ordering index for tracking visuals
 	measure Status_ordering = sum(Statuses[Index])
 		displayFolder: Tracking Visual
 		lineageTag: f34018d2-3f83-4a4d-a1b7-3a81a161e5e4
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Lower threshold value for comparison
+	measure Threshold_Lower = ```
+			
+	            IF(
+	                SELECTEDVALUE('Financials Parameter'[Financials Parameter Fields])= [Total Product Cost - Last N months], MINX(FILTER(Threshold,Threshold[Description] = "Cost_Upper"),Threshold[Value]),
+			                 MAXX(FILTER(Threshold,Threshold[Description] = "Sales_Lower"),Threshold[Value])
+			                
+			                   )
+			```
+		formatString: 0
+		lineageTag: dfe86031-3e9b-4654-aa2d-b46c6e3a5af5
+
+	/// Upper threshold value for comparison
+	measure Threshold_Upper = ```
+			
+	            SWITCH( 
+	                  TRUE(),
+	                ISSELECTEDMEASURE([Total Product Cost - Last N months]), MAXX(FILTER(Threshold,Threshold[Description] = "Cost_Lower"),Threshold[Value]),
+			                ISSELECTEDMEASURE([Total Sales revenue - Last N months]), MAXX(FILTER(Threshold,Threshold[Description] = "Sales_Upper"),Threshold[Value])
+			                , BLANK()
+			                   )
+			```
+		formatString: 0
+		lineageTag: ccfaede6-4c12-4c95-b38b-c5a5437ebb5c
+
+	/// Total sales for the previous year
+	measure 'Total Sales Previous Year' =
+			CALCULATE(
+		                            [Total Sales],
+		                            'Date'[Year] = SELECTEDVALUE('Date'[Year]) - 1
+		                    )
+		formatString: 0.0
+		lineageTag: 4c3e89b7-7f13-445f-9a5b-5d3611faad66
+
+	/// KPI title with current year
+	measure 'KPI Title' = "Total Sales " & FORMAT(SELECTEDVALUE('Date'[Year]),"#")
+		lineageTag: 0a4c2970-f429-4c59-aed9-974a117bf657
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Year-over-year growth percentage with trend indicator
+	measure Growth = ```
+			
+	    var _gr = FORMAT(
+	                    1-DIVIDE([Total Sales CY] , [Total Sales Previous Year]),
+	                    "#.#%"
+	                    )
+			    var _result = 
+			                IF( [Total Sales CY] > [Total Sales Previous Year], _gr & " ▲ ",
+			                    _gr & " ▼ "
+			                  )
+			    RETURN _result
+			```
+		lineageTag: 3dc6b14c-2aad-4a9f-815a-9b292fb11fe8
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Difference between current year and previous year sales
+	measure Total_Sales_trend = [Total Sales CY] -[Total Sales Previous Year]
+		formatString: 0
+		lineageTag: 8af576d3-a0c8-4f55-bcc9-40da9d07584f
+
+	/// Forecasted sales amount
+	measure 'Total sales Forecast' = SUM('Sales Forecast'[Forecast])*1000
+		lineageTag: 730aa254-f9b3-4896-848a-93f791190735
+
+		formatStringDefinition = pbi.NumberFormat()
 
 	partition Metrics-608e5cf7-cf60-467a-819d-73714f887b57 = m
 		mode: import

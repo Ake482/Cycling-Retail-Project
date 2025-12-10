@@ -1,0 +1,34 @@
+table Threshold
+	lineageTag: fcc0a7d0-ff92-4766-934c-82cac83073bc
+
+	column Description
+		dataType: string
+		lineageTag: d6833cf2-6cf5-40b6-aa0c-c9560b960ae9
+		summarizeBy: none
+		sourceColumn: Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column Value
+		dataType: double
+		lineageTag: 8d11596f-dcf6-4b7c-ad87-688788e80ae7
+		summarizeBy: sum
+		sourceColumn: Value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Threshold = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WCk7MSS2ODy0oSC1S0lEy0jNVitWBifrkl4NFDfXMwaLO+cUlCKUIIbg6pdhYAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Description = _t, Value = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Description", type text}, {"Value", type number}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

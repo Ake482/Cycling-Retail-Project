@@ -31,7 +31,7 @@ table 'Product Category'
 		mode: import
 		source =
 				let
-				    Source = Sql.Database("localhost", "AdventureworksDW2017"),
+				    Source = Sql.Database(Server, Database),
 				    dbo_DimProductCategory = Source{[Schema="dbo",Item="DimProductCategory"]}[Data],
 				    #"Removed Columns" = Table.RemoveColumns(dbo_DimProductCategory,{"DimProductSubcategory", "SpanishProductCategoryName", "FrenchProductCategoryName"}),
 				    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"EnglishProductCategoryName", "Category"}})

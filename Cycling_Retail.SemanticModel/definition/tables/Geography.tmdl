@@ -79,7 +79,7 @@ table Geography
 		mode: import
 		source =
 				let
-				    Source = Sql.Database("localhost", "AdventureworksDW2017"),
+				    Source = Sql.Database(Server, Database),
 				    dbo_DimGeography = Source{[Schema="dbo",Item="DimGeography"]}[Data],
 				    #"Removed Columns" = Table.RemoveColumns(dbo_DimGeography,{"DimCustomer", "DimReseller", "DimSalesTerritory", "SpanishCountryRegionName", "FrenchCountryRegionName"}),
 				    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"EnglishCountryRegionName", "Region"}})
